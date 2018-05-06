@@ -7,7 +7,7 @@ public class Deque<Item> implements Iterable<Item> {
     private Node<Item> last;
 
     private class Node<Item> {
-        private Item item;
+        final private Item item;
         private Node<Item> next;
         private Node<Item> previous;
 
@@ -18,11 +18,7 @@ public class Deque<Item> implements Iterable<Item> {
         }
     }
 
-    //TODO: Should I init this?
     public Deque() {
-        this.size = 0;
-        this.first = null;
-        this.last = null;
     }
 
     public boolean isEmpty() {
@@ -33,47 +29,52 @@ public class Deque<Item> implements Iterable<Item> {
         return size;
     }
 
-    public void addFirst(Item item) throws IllegalArgumentException {
-        validateItem(item);
-
+    public void addFirst(Item item) {
+        checkNull(item);
         Node<Item> oldFirst = first;
         first = new Node<>(item, oldFirst, null);
         if (isEmpty()) {
             last = first;
+        } else {
+            oldFirst.previous = first;
         }
         size++;
     }
 
-    public void addLast(Item item) throws IllegalArgumentException {
-        validateItem(item);
+    public void addLast(Item item) {
+        checkNull(item);
 
         Node<Item> oldLast = last;
         last = new Node<>(item, null, oldLast);
         if (isEmpty()) {
             first = last;
+        } else {
+            oldLast.next = last;
         }
         size++;
     }
 
     public Item removeFirst() {
-        validateEmpty();
+        checkDequeIsEmpty();
         Item item = first.item;
         first = first.next;
+        first.previous = null;
+        size--;
         if (isEmpty()) {
             last = null;
         }
-        size--;
         return item;
     }
 
     public Item removeLast() {
-        validateEmpty();
+        checkDequeIsEmpty();
         Item item = last.item;
         last = last.previous;
+        last.next = null;
+        size--;
         if (isEmpty()) {
             first = null;
         }
-        size--;
         return item;
     }
 
@@ -87,11 +88,14 @@ public class Deque<Item> implements Iterable<Item> {
 
         @Override
         public boolean hasNext() {
-            return current.next != null;
+            return current != null;
         }
 
         @Override
         public Item next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             Item item = current.item;
             current = current.next;
             return item;
@@ -103,31 +107,27 @@ public class Deque<Item> implements Iterable<Item> {
         }
     }
 
-    private void validateItem(Item item) throws IllegalArgumentException {
+    private void checkNull(Item item) {
         if (item == null) {
             throw new IllegalArgumentException();
         }
     }
 
-    private void validateEmpty() {
+    private void checkDequeIsEmpty() {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
     }
 
     public static void main(String[] args) {
-        Deque<String> deque =  new Deque<>();
+        Deque<Integer> deque = new Deque<>();
         System.out.println(deque.isEmpty());
-        deque.addFirst("first");
-        deque.addLast("second and last");
+        deque.addFirst(1);
+        deque.addLast(2);
+        deque.addFirst(3);
+        deque.addLast(4);
         System.out.println(deque.size());
-
-        for (String s : deque){
-            System.out.println(s);
-        }
-//
-//        System.out.println(deque.removeFirst());
-//        System.out.println(deque.removeLast());
-
+        System.out.println(deque.removeLast());
+        System.out.println(deque.removeFirst());
     }
 }
