@@ -5,7 +5,6 @@ import java.util.NoSuchElementException;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private int size;
-    private int biggestInsertedIndex;
     private Item[] items;
 
     public RandomizedQueue() {
@@ -21,26 +20,19 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public void enqueue(Item item) {
-        if (biggestInsertedIndex >= items.length) {
+        if (size == items.length) {
             resize(items.length * 2);
         }
-        items[biggestInsertedIndex] = item;
-        biggestInsertedIndex++;
-        size++;
+        items[size++] = item;
     }
 
     public Item dequeue() {
         checkEmpty();
-        Item item = null;
-        //???
-        int index = 0;
-        while (item == null) {
-            index = StdRandom.uniform(biggestInsertedIndex);
-            item = items[index];
-        }
-        items[index] = null;
-        size--;
-        if (size < items.length / 4) {
+        int index = StdRandom.uniform(size);
+        Item item = items[index];
+        items[index] = items[size - 1];
+        items[--size] = null;
+        if (size > 0 && size == items.length / 4) {
             resize(items.length / 2);
         }
         return item;
@@ -48,11 +40,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public Item sample() {
         checkEmpty();
-        Item item = null;
-        while (item == null) {
-            item = items[StdRandom.uniform(biggestInsertedIndex)];
-        }
-        return item;
+        return items[StdRandom.uniform(size)];
     }
 
     private void checkEmpty() {
@@ -63,14 +51,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private void resize(int capacity) {
         Item[] newArray = (Item[]) new Object[capacity];
-        int insertIndex = 0;
-        for (Item item : items) {
-            if (item != null) {
-                newArray[insertIndex] = item;
-                insertIndex++;
-            }
+        for (int i = 0; i < size; i++) {
+            newArray[i] = items[i];
         }
-        biggestInsertedIndex = size;
         items = newArray;
     }
 
@@ -79,14 +62,22 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class RandomizedQueueIterator implements Iterator<Item> {
+        int[] randomIndexes = new int[size];
+        int current = 0;
+
+        RandomizedQueueIterator() {
+            StdRandom.shuffle(randomIndexes);
+        }
+
         @Override
         public boolean hasNext() {
-            return isEmpty();
+            return current < size;
         }
 
         @Override
         public Item next() {
-            return dequeue();
+            if (!hasNext()) throw new NoSuchElementException();
+            return items[randomIndexes[current++]];
         }
 
         @Override
@@ -96,14 +87,15 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public static void main(String[] args) {
-        RandomizedQueue<Integer> queue = new RandomizedQueue<>();
-        for (int i = 0; i < 10; i++) {
-            queue.enqueue(i);
-        }
-
-        for (int i = 0; i < 10; i++) {
-            System.out.println(queue.dequeue());
-        }
+        RandomizedQueue<Integer> rq = new RandomizedQueue<>();
+        rq.isEmpty();
+        rq.size();
+        rq.enqueue(46);
+        rq.enqueue(27);
+        rq.dequeue();
+        rq.size();
+        rq.enqueue(41);
+        rq.dequeue();
     }
 
 

@@ -122,6 +122,10 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     public static void main(String[] args) {
+
+        String [] str = new String[10];
+        System.out.println(str.length);
+
         Deque<Integer> deque = new Deque<>();
         System.out.println(deque.isEmpty());
         deque.addFirst(1);
