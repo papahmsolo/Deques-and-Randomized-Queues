@@ -20,6 +20,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public void enqueue(Item item) {
+        if (item == null){
+            throw new IllegalArgumentException();
+        }
         if (size == items.length) {
             resize(items.length * 2);
         }
@@ -27,7 +30,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public Item dequeue() {
-        checkEmpty();
+        checkQueueIsEmpty();
         int index = StdRandom.uniform(size);
         Item item = items[index];
         items[index] = items[size - 1];
@@ -39,11 +42,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public Item sample() {
-        checkEmpty();
+        checkQueueIsEmpty();
         return items[StdRandom.uniform(size)];
     }
 
-    private void checkEmpty() {
+    private void checkQueueIsEmpty() {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
