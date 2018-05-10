@@ -66,6 +66,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         int current = 0;
 
         RandomizedQueueIterator() {
+            for (int i = 0; i < size; i++) {
+                randomIndexes[i] = i;
+            }
             StdRandom.shuffle(randomIndexes);
         }
 
